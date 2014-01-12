@@ -1,4 +1,4 @@
-package easyjchart;
+package com.raccoon.easyJChart;
 
 /*
  	-----------------------------------------------------------------
