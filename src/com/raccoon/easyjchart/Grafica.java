@@ -1,31 +1,11 @@
-package com.raccoon.easyJChart;
+package com.raccoon.easyjchart;
 
-/*
- 	-----------------------------------------------------------------
- 	 @file   Grafica.java
-     @author Miguel Jimenez Lopez, Juan Hernandez Garcia
-     @brief
- 	-----------------------------------------------------------------	
-    Copyright (C) 2014  Modesto Modesto T Lopez-Lopez
-    					Miguel Jimenez Lopez
-    					Juan Hernandez Garcia
-    					
-						
-						University of Granada
-	--------------------------------------------------------------------					
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
+/**
+ * Versión 1.0 de la clase Grafica.java
+ * @author Miguel Jiménez López
+ * @date 31/5/2012
+ */
 
 
 /**
@@ -44,15 +24,23 @@ import java.awt.Rectangle;
 import java.awt.Shape;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Point2D;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+
+import javax.imageio.ImageIO;
 
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.NumberAxis;
+import org.jfree.chart.plot.Plot;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.plot.XYPlot;
+import org.jfree.chart.renderer.xy.XYItemRenderer;
 import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
+
 
 /**
 *
@@ -77,6 +65,9 @@ private JFreeChart grafica = null;
  */
 private Paint fondo_defecto = null;
 
+private BufferedImage plotImage;
+
+
 
 /**
  * Construtor de la clase Grafica. Permite inicializar la gráfica con una determinada función.
@@ -88,7 +79,7 @@ private Paint fondo_defecto = null;
  */
 
 public Grafica(Point2D[] funcion,String nombre_grafica, String nombre_funcion, String etiqueta_X, String etiqueta_Y) {
-    generaGrafica(funcion,nombre_grafica,nombre_funcion,etiqueta_X,etiqueta_Y,false,Color.RED,1f); 
+    generaGrafica(funcion,nombre_grafica,nombre_funcion,etiqueta_X,etiqueta_Y,false,Color.RED,1f,true); 
 }
 
 /**
@@ -102,7 +93,7 @@ public Grafica(Point2D[] funcion,String nombre_grafica, String nombre_funcion, S
  */
 
 public Grafica(Point2D[] funcion,String nombre_grafica, String nombre_funcion, String etiqueta_X, String etiqueta_Y,boolean mostrar_leyenda) {
-    generaGrafica(funcion,nombre_grafica,nombre_funcion,etiqueta_X,etiqueta_Y,mostrar_leyenda,Color.RED,1f); 
+    generaGrafica(funcion,nombre_grafica,nombre_funcion,etiqueta_X,etiqueta_Y,mostrar_leyenda,Color.RED,1f,true); 
 }
 
 /**
@@ -115,10 +106,11 @@ public Grafica(Point2D[] funcion,String nombre_grafica, String nombre_funcion, S
  * @param mostrar_leyenda Indica si se quiere o no visualizar la leyenda de la gráfica.
  * @param color_funcion Indica el color con el que se quiere representar la función.
  * @param grosor Indica el grosor de linea con el que se quiere representar la función.
+ * @param isContinuous True for continous function. False for discrete function.
  */
 
-public Grafica(Point2D[] funcion,String nombre_grafica, String nombre_funcion, String etiqueta_X, String etiqueta_Y,boolean mostrar_leyenda,Color color_funcion, float grosor) {
-    generaGrafica(funcion,nombre_grafica,nombre_funcion,etiqueta_X,etiqueta_Y,mostrar_leyenda,color_funcion,grosor);    
+public Grafica(Point2D[] funcion,String nombre_grafica, String nombre_funcion, String etiqueta_X, String etiqueta_Y,boolean mostrar_leyenda,Color color_funcion, float grosor, boolean isContinuous) {
+    generaGrafica(funcion,nombre_grafica,nombre_funcion,etiqueta_X,etiqueta_Y,mostrar_leyenda,color_funcion,grosor, isContinuous);    
 }
 
 /**
@@ -164,9 +156,11 @@ public void visualizaMuestras(int ngrafica, boolean visible, int tam) {
     if(visible == true) {
         circulo = new Ellipse2D.Double(-tam,-tam,2*tam,2*tam);
         ((XYLineAndShapeRenderer) grafica.getXYPlot().getRenderer(ngrafica)).setSeriesShape(0, circulo);
+        
     }
     
     ((XYLineAndShapeRenderer) grafica.getXYPlot().getRenderer(ngrafica)).setSeriesShapesVisible(0, visible);
+    
 }
 
 /**
@@ -189,6 +183,8 @@ public void fijaColor(int ngrafica, Color color) {
     grafica.getXYPlot().getRenderer(ngrafica).setSeriesPaint(0, color);
 }
 
+
+
 /**
  * Añade una nueva función a la gráfica.
  * @param funcion Conjunto de puntos que determina la función que se quiere añadir.
@@ -196,7 +192,7 @@ public void fijaColor(int ngrafica, Color color) {
  */
 
 public void agregarGrafica(Point2D[] funcion, String nombre_funcion) {
-    agregarGrafica(funcion,nombre_funcion,Color.RED,1f);
+    agregarGrafica(funcion,nombre_funcion,Color.RED,1f,true);
 }
 
 /**
@@ -205,17 +201,21 @@ public void agregarGrafica(Point2D[] funcion, String nombre_funcion) {
  * @param nombre_funcion Nombre que identifica a la función a añadir.
  * @param color_funcion Color de la función que se quiere añadir.
  * @param grosor Grosor de la función que se quiere añadir.
+ * @param isContinuous True for continous function. False for discrete function.
  */
 
-public void agregarGrafica(Point2D[] funcion, String nombre_funcion, Color color_funcion,float grosor) {
+public void agregarGrafica(Point2D[] funcion, String nombre_funcion, Color color_funcion,float grosor, boolean isContinuous) {
     
-    XYSeries dataset = new XYSeries(nombre_funcion);
+    XYSeries dataset = new XYSeries(nombre_funcion,isContinuous);
     XYSeriesCollection series_datos = null;
     
     XYPlot plot = grafica.getXYPlot();
 
     for(int i = 0 ; i < funcion.length ; i++) {
         dataset.add(funcion[i].getX(),funcion[i].getY());
+        if(!isContinuous){
+        	dataset.add(Double.NaN, Double.NaN);
+        }
     }
 
     
@@ -351,17 +351,21 @@ private void quitaRangoX(int n_grafica) {
  * @param mostrar_leyenda Indica si se quiere o no visualizar la leyenda de la gráfica.
  * @param color_funcion Indica el color con el que se quiere representar la función.
  * @param grosor Indica el grosor de linea con el que se quiere representar la función.
+ * @param isContinuous True for continous function. False for discrete function.
  */
 
-private void generaGrafica(Point2D[] funcion,String nombre_grafica, String nombre_funcion, String etiqueta_X, String etiqueta_Y, boolean mostrar_leyenda, Color color_funcion, float grosor_funcion) {
+private void generaGrafica(Point2D[] funcion,String nombre_grafica, String nombre_funcion, String etiqueta_X, String etiqueta_Y, boolean mostrar_leyenda, Color color_funcion, float grosor_funcion, boolean isContinuous) {
 
-    XYSeries dataset = new XYSeries(nombre_funcion);
+    XYSeries dataset = new XYSeries(nombre_funcion, isContinuous);
     XYSeriesCollection series_datos = null;
 
     n_series = 0;
     
     for(int i = 0 ; i < funcion.length ; i++) {
         dataset.add(funcion[i].getX(),funcion[i].getY());
+        if(!isContinuous){
+        	dataset.add(Double.NaN, Double.NaN);
+        }
     }
 
     series_datos = new XYSeriesCollection(dataset);
@@ -378,11 +382,12 @@ private void generaGrafica(Point2D[] funcion,String nombre_grafica, String nombr
     false
     );
     
+  
+    
     fondo_defecto = ((XYPlot) grafica.getPlot()).getBackgroundPaint();
-
-
+    grafica.getXYPlot().getRenderer(0).setSeriesStroke(0,new BasicStroke(grosor_funcion)); 
     grafica.getXYPlot().getRenderer(0).setSeriesPaint(0, color_funcion);
-
+    
 }
 
 /**
@@ -396,12 +401,60 @@ public int obtenerNumeroGraficas() {
 /**
  * Función que pinta las funciones contenidas en la gráfica en pantalla.
  * @param g Lienzo donde se representarán las funciones
- * @param area �?rea donde se dibujarán las funciones
+ * @param area �?rea donde se dibujarán las funciones
  */
 
 public void pintar(Graphics g, Rectangle area) {
     grafica.draw((Graphics2D) g,area);
 }
 
+public XYItemRenderer getFunction(int i){
+	return this.grafica.getXYPlot().getRenderer(i);
+}
+
+/**
+ * Replaces the plot of the indicated index.
+ * @param nPlot Index
+ * @param function Function to represent
+ * @param functionName Name of the function
+ * @param functionColor Color of the function
+ * @param stroke Stroke of the function
+ * @param isContinuous True if function is continuous. False if is discrete.
+ */
+public void replacePlot(int nPlot, Point2D[] function, String functionName, Color functionColor,float stroke, boolean isContinuous){
+	XYSeries dataset = new XYSeries(functionName,isContinuous);
+    XYSeriesCollection series_datos = null;
+    
+    XYPlot plot = grafica.getXYPlot();
+
+    for(int i = 0 ; i < function.length ; i++) {
+        dataset.add(function[i].getX(),function[i].getY());
+        if(!isContinuous){
+        	dataset.add(Double.NaN, Double.NaN);
+        }
+    }
+
+    
+    series_datos = new XYSeriesCollection(dataset);
+    
+    plot.setDataset(nPlot,series_datos);
+    plot.mapDatasetToRangeAxis(nPlot, 0);
+    plot.mapDatasetToDomainAxis(nPlot, 0);
+    plot.setRenderer(nPlot,new XYLineAndShapeRenderer());
+    
+    plot.getRenderer(nPlot).setSeriesPaint(0,functionColor);
+    plot.getRenderer(nPlot).setSeriesStroke(0,new BasicStroke(stroke));  
+   ((XYLineAndShapeRenderer) plot.getRenderer(nPlot)).setSeriesShapesVisible(0,false);
+}
+
+public void setBackGroundImage(String fileName, float alpha) throws IOException{
+	this.plotImage = ImageIO.read(new File(fileName));
+	grafica.getPlot().setBackgroundImage(plotImage);
+	grafica.getPlot().setBackgroundImageAlpha(alpha);
+}
+
+public Plot getPlot(){
+	return grafica.getPlot();
+}
 
 }
