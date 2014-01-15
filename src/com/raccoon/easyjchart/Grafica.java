@@ -33,6 +33,7 @@ import javax.imageio.ImageIO;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.NumberAxis;
+import org.jfree.chart.axis.ValueAxis;
 import org.jfree.chart.plot.Plot;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.plot.XYPlot;
@@ -65,9 +66,10 @@ private JFreeChart grafica = null;
  */
 private Paint fondo_defecto = null;
 
-private BufferedImage plotImage;
-
-
+/**
+ * Buffer to load the image of the background of the chart
+ */
+private BufferedImage backGroundImage;
 
 /**
  * Construtor de la clase Grafica. Permite inicializar la gráfica con una determinada función.
@@ -123,9 +125,9 @@ public Grafica(Point2D[] funcion,String nombre_grafica, String nombre_funcion, S
 
 public void fijaRango(double rinferior, double rsuperior, int n_grafica, int ejeXY) {
     if(ejeXY == 0)
-        fijaRangoX(rinferior,rsuperior,n_grafica);
+        setXRange(rinferior,rsuperior,n_grafica);
     else
-        fijaRangoY(rinferior,rsuperior,n_grafica);
+        setYRange(rinferior,rsuperior,n_grafica);
 }
 
 /**
@@ -296,27 +298,62 @@ public void restableceFondo() {
 }
 
 /**
- * Fija el rango de valores que se visualiza del eje de ordenadas para una gráfica concreta.
- * @param rinferior Representa el límite inferior.
- * @param rsuperior Representa el límite superior.
- * @param n_grafica Indica la función a la que se le aplicará el rango (la primera es la 0)
+ * Set the Y range of a concrete plot
+ * @param inferior  New inferior limit of the Y axis
+ * @param superior New superior limit of the Y axis 
+ * @param n_grafica Index of the plot. (The first index is 0)
  */
-
-private void fijaRangoY(double inferior, double superior,int n_grafica) {
+public void setYRange(double inferior, double superior,int n_grafica) {
     grafica.getXYPlot().getRangeAxisForDataset(n_grafica).setAutoRange(false);
     grafica.getXYPlot().getRangeAxisForDataset(n_grafica).setRange(inferior,superior);
 }
 
-/**
- * Fija el rango de valores que se visualiza del eje de abcisas para una gráfica concreta.
- * @param rinferior Representa el límite inferior.
- * @param rsuperior Representa el límite superior.
- * @param n_grafica Indica la función a la que se le aplicará el rango (la primera es la 0)
- */
 
-private void fijaRangoX(double inferior, double superior, int n_grafica) {
-    grafica.getXYPlot().getDomainAxisForDataset(n_grafica).setAutoRange(false);
-    grafica.getXYPlot().getDomainAxisForDataset(n_grafica).setRange(inferior,superior);
+/**
+ * Set the X range of a concrete plot
+ * @param inferior  New inferior limit of the X axis
+ * @param superior New superior limit of the X axis 
+ * @param n_grafica Index of the plot. (The first index is 0)
+ */
+public void setXRange(double inferior, double superior, int nPlot) {
+    grafica.getXYPlot().getDomainAxisForDataset(nPlot).setAutoRange(false);
+    grafica.getXYPlot().getDomainAxisForDataset(nPlot).setRange(inferior,superior);
+}
+
+/**
+ * Set the X range of all plots in the chart
+ * @param inferior  New inferior limit of the X axis
+ * @param superior New superior limit of the X axis 
+ */
+public void setXRange(int inferior, int superior){
+	int domainsNum  = grafica.getXYPlot().getDomainAxisCount();
+	for(int i = 0; i < domainsNum; i++){
+		setXRange(inferior, superior, i);
+	}
+}
+
+/**
+ * Set the Y range of all plots in the chart
+ * @param inferior  New inferior limit of the Y axis
+ * @param superior New superior limit of the Y axis 
+ */
+public void setYRange(int inferior, int superior){
+	int domainsNum  = grafica.getXYPlot().getDomainAxisCount();
+	for(int i = 0; i < domainsNum; i++){
+		setYRange(inferior, superior, i);
+	}
+}
+
+/**
+ * Set the X-Y range of all plots in the chart
+ * @param infXLimit New inferior X limit
+ * @param supXLimit New superior X limit
+ * @param infYLimit New inferior Y limit
+ * @param supYLimit New superior Y limit
+ */
+public void setRangeAxis(int infXLimit, int supXLimit, int infYLimit, int supYLimit){
+	setXRange(infXLimit, supXLimit);
+	setYRange(infYLimit, supYLimit);
 }
 
 /**
@@ -355,7 +392,7 @@ private void quitaRangoX(int n_grafica) {
  */
 
 private void generaGrafica(Point2D[] funcion,String nombre_grafica, String nombre_funcion, String etiqueta_X, String etiqueta_Y, boolean mostrar_leyenda, Color color_funcion, float grosor_funcion, boolean isContinuous) {
-
+	
     XYSeries dataset = new XYSeries(nombre_funcion, isContinuous);
     XYSeriesCollection series_datos = null;
 
@@ -448,8 +485,8 @@ public void replacePlot(int nPlot, Point2D[] function, String functionName, Colo
 }
 
 public void setBackGroundImage(String fileName, float alpha) throws IOException{
-	this.plotImage = ImageIO.read(new File(fileName));
-	grafica.getPlot().setBackgroundImage(plotImage);
+	this.backGroundImage = ImageIO.read(new File(fileName));
+	grafica.getPlot().setBackgroundImage(backGroundImage);
 	grafica.getPlot().setBackgroundImageAlpha(alpha);
 }
 
