@@ -19,11 +19,14 @@ import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Image;
 import java.awt.Paint;
 import java.awt.Rectangle;
 import java.awt.Shape;
+import java.awt.geom.AffineTransform;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Point2D;
+import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -32,8 +35,9 @@ import javax.imageio.ImageIO;
 
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.JFreeChart;
+import org.jfree.chart.annotations.XYAnnotation;
+import org.jfree.chart.annotations.XYImageAnnotation;
 import org.jfree.chart.axis.NumberAxis;
-import org.jfree.chart.axis.ValueAxis;
 import org.jfree.chart.plot.Plot;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.plot.XYPlot;
@@ -69,7 +73,7 @@ private Paint fondo_defecto = null;
 /**
  * Buffer to load the image of the background of the chart
  */
-private BufferedImage backGroundImage;
+private Image backGroundImage;
 
 /**
  * Construtor de la clase Grafica. Permite inicializar la gráfica con una determinada función.
@@ -152,7 +156,7 @@ public void quitaRango(int n_grafica,int ejeXY) {
  * @param tam Representa el tamaño del círculo
  */
 
-public void visualizaMuestras(int ngrafica, boolean visible, int tam) {
+public void visualizaMuestras(int ngrafica, boolean visible, double tam) {
     Shape circulo = null;
     
     if(visible == true) {
@@ -485,10 +489,59 @@ public void replacePlot(int nPlot, Point2D[] function, String functionName, Colo
 }
 
 public void setBackGroundImage(String fileName, float alpha) throws IOException{
-	this.backGroundImage = ImageIO.read(new File(fileName));
+	this.backGroundImage = ImageIO.read(new File(fileName));	
 	grafica.getPlot().setBackgroundImage(backGroundImage);
 	grafica.getPlot().setBackgroundImageAlpha(alpha);
 }
+
+public void setBackGroundImage(Image img, float alpha) throws IOException{
+	
+	this.backGroundImage = img;
+	
+	grafica.getPlot().setBackgroundImage(backGroundImage);
+	grafica.getPlot().setBackgroundImageAlpha(alpha);
+}
+
+/**
+ * Loads and image in a especific point of the chart, and allows to rotate it
+ * @param image Image to be loaded
+ * @param xCoordinate X Coordinate
+ * @param yCoordinate Y Coordinate
+ * @param degrees Degrees to rotate
+ */
+public void setImage(BufferedImage image, double xCoordinate,double yCoordinate, double degrees){
+
+    //Rotation
+	AffineTransform transform = new AffineTransform();
+	int h = image.getHeight();
+	int w = image.getWidth();
+    transform.rotate(Math.toRadians(degrees), h/2, w/2);
+    AffineTransformOp op = new AffineTransformOp(transform, AffineTransformOp.TYPE_BILINEAR);
+    image = op.filter(image, null);
+	
+	
+    //Representation in the point
+    XYAnnotation xyannotation = new XYImageAnnotation(xCoordinate, yCoordinate, image); 
+	grafica.getXYPlot().addAnnotation(xyannotation); 	
+}
+
+
+public BufferedImage loadImage(String fileName){
+
+    BufferedImage buff = null;
+    try {
+        buff = ImageIO.read(getClass().getResourceAsStream(fileName));
+    } catch (IOException e) {
+        // TODO Auto-generated catch block
+        e.printStackTrace();
+        return null;
+    }
+    return buff;
+
+}
+
+
+
 
 public Plot getPlot(){
 	return grafica.getPlot();
