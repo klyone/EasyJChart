@@ -503,26 +503,33 @@ public void setBackGroundImage(Image img, float alpha) throws IOException{
 }
 
 /**
- * Loads and image in a especific point of the chart, and allows to rotate it
+ * Set an image in a especific point of the chart.
  * @param image Image to be loaded
  * @param xCoordinate X Coordinate
  * @param yCoordinate Y Coordinate
  * @param degrees Degrees to rotate
+ * @return The annotation used to draw the image (useful to delete it)
  */
-public void setImage(BufferedImage image, double xCoordinate,double yCoordinate, double degrees){
-
-    //Rotation
-	AffineTransform transform = new AffineTransform();
-	int h = image.getHeight();
-	int w = image.getWidth();
-    transform.rotate(Math.toRadians(degrees), h/2, w/2);
-    AffineTransformOp op = new AffineTransformOp(transform, AffineTransformOp.TYPE_BILINEAR);
-    image = op.filter(image, null);
-	
-	
+public XYAnnotation setImageAtPoint(BufferedImage image, double xCoordinate,double yCoordinate){
+   
     //Representation in the point
     XYAnnotation xyannotation = new XYImageAnnotation(xCoordinate, yCoordinate, image); 
 	grafica.getXYPlot().addAnnotation(xyannotation); 	
+	return xyannotation;
+}
+
+/**
+ * Set an image in a especific point of the chart.
+ * @param image Image to be loaded
+ * @param point Point to set the image in the chart
+ * @return The annotation used to draw the image (useful to delete it)
+ */
+public XYAnnotation setImageAtPoint(BufferedImage image, Point2D point){
+	return this.setImageAtPoint(image, point.getX(), point.getY());
+}
+
+public void deleteImage(XYAnnotation xyannotation){
+	grafica.getXYPlot().removeAnnotation(xyannotation);
 }
 
 
@@ -542,6 +549,11 @@ public BufferedImage loadImage(String fileName){
 
 
 
+
+
+public JFreeChart getGrafica() {
+	return grafica;
+}
 
 public Plot getPlot(){
 	return grafica.getPlot();
