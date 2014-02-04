@@ -529,7 +529,9 @@ public XYAnnotation setImageAtPoint(BufferedImage image, Point2D point){
 }
 
 public void deleteImage(XYAnnotation xyannotation){
-	grafica.getXYPlot().removeAnnotation(xyannotation);
+	if(xyannotation != null){
+		grafica.getXYPlot().removeAnnotation(xyannotation);
+	}
 }
 
 
