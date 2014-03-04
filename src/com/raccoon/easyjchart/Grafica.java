@@ -551,8 +551,6 @@ public BufferedImage loadImage(String fileName){
 
 
 
-
-
 public JFreeChart getGrafica() {
 	return grafica;
 }
