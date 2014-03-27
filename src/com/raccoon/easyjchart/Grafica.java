@@ -1,6 +1,5 @@
 package com.raccoon.easyjchart;
 
-
 /**
  * Versión 1.0 de la clase Grafica.java
  * @author Miguel Jiménez López
@@ -348,6 +347,7 @@ public void setYRange(int inferior, int superior){
 	}
 }
 
+
 /**
  * Set the X-Y range of all plots in the chart
  * @param infXLimit New inferior X limit
@@ -358,6 +358,11 @@ public void setYRange(int inferior, int superior){
 public void setRangeAxis(int infXLimit, int supXLimit, int infYLimit, int supYLimit){
 	setXRange(infXLimit, supXLimit);
 	setYRange(infYLimit, supYLimit);
+}
+
+public void setRangeAxis(Point2D xLimit, Point2D yLimit){
+	setXRange((int)xLimit.getX(),(int)xLimit.getY());
+	setYRange((int)yLimit.getX(),(int)yLimit.getY());
 }
 
 /**
