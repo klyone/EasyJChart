@@ -22,10 +22,9 @@ import java.awt.Image;
 import java.awt.Paint;
 import java.awt.Rectangle;
 import java.awt.Shape;
-import java.awt.geom.AffineTransform;
+import java.awt.Stroke;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Point2D;
-import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -35,6 +34,7 @@ import javax.imageio.ImageIO;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.annotations.XYAnnotation;
+import org.jfree.chart.annotations.XYBoxAnnotation;
 import org.jfree.chart.annotations.XYImageAnnotation;
 import org.jfree.chart.axis.NumberAxis;
 import org.jfree.chart.plot.Plot;
@@ -531,6 +531,53 @@ public XYAnnotation setImageAtPoint(BufferedImage image, double xCoordinate,doub
  */
 public XYAnnotation setImageAtPoint(BufferedImage image, Point2D point){
 	return this.setImageAtPoint(image, point.getX(), point.getY());
+}
+
+/**
+ * Draw a box in the chart
+ * @param x0 The lower x coordinate in the box
+ * @param y0 The lower y coordinate in the box
+ * @param x1 the higher x coordinate in the box
+ * @param y1 The higher y coordinate in the box
+ * @return The annotation of the box
+ */
+public XYAnnotation drawBox(double x0, double y0, double x1, double y1){
+	XYAnnotation boxAnnotation = new XYBoxAnnotation(x0,y0,x1,y1);
+	grafica.getXYPlot().addAnnotation(boxAnnotation);
+	return boxAnnotation;
+}
+
+/**
+ * Draw a box in the chart
+ * @param x0 The lower x coordinate in the box
+ * @param y0 The lower y coordinate in the box
+ * @param x1 the higher x coordinate in the box
+ * @param y1 The higher y coordinate in the box
+ * @param stroke  the shape stroke (null permitted)
+ * @param outlinePaint  the shape color (null permitted).
+ * @return The annotation of the box
+ */
+public XYAnnotation drawBox(double x0, double y0, double x1, double y1, Stroke stroke, Paint outlinePaint){
+	XYAnnotation boxAnnotation = new XYBoxAnnotation(x0,y0,x1,y1, stroke, outlinePaint);
+	grafica.getXYPlot().addAnnotation(boxAnnotation);
+	return boxAnnotation;
+}
+
+/**
+ * Draw a box in the chart
+ * @param x0 The lower x coordinate in the box
+ * @param y0 The lower y coordinate in the box
+ * @param x1 the higher x coordinate in the box
+ * @param y1 The higher y coordinate in the box
+ * @param stroke  the shape stroke (null permitted)
+ * @param outlinePaint  the shape color (null permitted).
+ * @param fillPaint  the paint used to fill the shape (null permitted).
+ * @return The annotation of the box
+ */
+public XYAnnotation drawBox(double x0, double y0, double x1, double y1, Stroke stroke, Paint outlinePaint, Paint fillPaint){
+	XYAnnotation boxAnnotation = new XYBoxAnnotation(x0,y0,x1,y1, stroke, outlinePaint, fillPaint);
+	grafica.getXYPlot().addAnnotation(boxAnnotation);
+	return boxAnnotation;
 }
 
 public void deleteImage(XYAnnotation xyannotation){
