@@ -33,9 +33,11 @@ import javax.imageio.ImageIO;
 
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.JFreeChart;
+import org.jfree.chart.annotations.TextAnnotation;
 import org.jfree.chart.annotations.XYAnnotation;
 import org.jfree.chart.annotations.XYBoxAnnotation;
 import org.jfree.chart.annotations.XYImageAnnotation;
+import org.jfree.chart.annotations.XYLineAnnotation;
 import org.jfree.chart.axis.NumberAxis;
 import org.jfree.chart.plot.Plot;
 import org.jfree.chart.plot.PlotOrientation;
@@ -328,7 +330,7 @@ public void setXRange(double inferior, double superior, int nPlot) {
  * @param inferior  New inferior limit of the X axis
  * @param superior New superior limit of the X axis 
  */
-public void setXRange(int inferior, int superior){
+public void setXRange(double inferior, double superior){
 	int domainsNum  = grafica.getXYPlot().getDomainAxisCount();
 	for(int i = 0; i < domainsNum; i++){
 		setXRange(inferior, superior, i);
@@ -340,7 +342,7 @@ public void setXRange(int inferior, int superior){
  * @param inferior  New inferior limit of the Y axis
  * @param superior New superior limit of the Y axis 
  */
-public void setYRange(int inferior, int superior){
+public void setYRange(double inferior, double superior){
 	int domainsNum  = grafica.getXYPlot().getDomainAxisCount();
 	for(int i = 0; i < domainsNum; i++){
 		setYRange(inferior, superior, i);
@@ -359,6 +361,19 @@ public void setRangeAxis(int infXLimit, int supXLimit, int infYLimit, int supYLi
 	setXRange(infXLimit, supXLimit);
 	setYRange(infYLimit, supYLimit);
 }
+
+/**
+ * Set the X-Y range of all plots in the chart
+ * @param infXLimit New inferior X limit
+ * @param supXLimit New superior X limit
+ * @param infYLimit New inferior Y limit
+ * @param supYLimit New superior Y limit
+ */
+public void setRangeAxis(double infXLimit, double supXLimit, double infYLimit, double supYLimit){
+	setXRange(infXLimit, supXLimit);
+	setYRange(infYLimit, supYLimit);
+}
+
 
 public void setRangeAxis(Point2D xLimit, Point2D yLimit){
 	setXRange((int)xLimit.getX(),(int)xLimit.getY());
@@ -384,6 +399,15 @@ private void quitaRangoY(int n_grafica) {
 
 private void quitaRangoX(int n_grafica) {
     grafica.getXYPlot().getDomainAxisForDataset(n_grafica).setAutoRange(true);
+}
+
+public void setAxisVisible(boolean visible){
+    grafica.getXYPlot().getDomainAxis().setVisible(visible);
+    grafica.getXYPlot().getRangeAxis().setVisible(visible);
+    grafica.getXYPlot().setOutlineVisible(visible);
+}
+
+public void removeAxis(int n_grafica){
 }
 
 /**
@@ -523,6 +547,7 @@ public XYAnnotation setImageAtPoint(BufferedImage image, double xCoordinate,doub
 	return xyannotation;
 }
 
+
 /**
  * Set an image in a especific point of the chart.
  * @param image Image to be loaded
@@ -531,6 +556,10 @@ public XYAnnotation setImageAtPoint(BufferedImage image, double xCoordinate,doub
  */
 public XYAnnotation setImageAtPoint(BufferedImage image, Point2D point){
 	return this.setImageAtPoint(image, point.getX(), point.getY());
+}
+
+public void setAnnotation(XYAnnotation annotation, double x, double y){
+	grafica.getXYPlot().addAnnotation(annotation);
 }
 
 /**
@@ -580,7 +609,37 @@ public XYAnnotation drawBox(double x0, double y0, double x1, double y1, Stroke s
 	return boxAnnotation;
 }
 
-public void deleteImage(XYAnnotation xyannotation){
+/**
+ * Draw a line in the chart
+ * @param x0 The lower x coordinate in the line
+ * @param y0 The lower y coordinate in the line
+ * @param x1 the higher x coordinate in the line
+ * @param y1 The higher y coordinate in the line
+ * @param stroke  the shape stroke (null permitted)
+ * @param outlinePaint  the shape color (null permitted).
+ * @return The annotation of the line
+ */
+public XYAnnotation drawLine(double x0, double y0, double x1, double y1, Stroke stroke, Paint outlinePaint){
+	XYAnnotation lineAnnotation = new XYLineAnnotation(x0, y0, x1, y1, stroke, outlinePaint);
+	grafica.getXYPlot().addAnnotation(lineAnnotation);
+	return lineAnnotation;
+}
+
+/**
+ * Draw a line in the chart
+ * @param x0 The lower x coordinate in the line
+ * @param y0 The lower y coordinate in the line
+ * @param x1 the higher x coordinate in the line
+ * @param y1 The higher y coordinate in the line
+ * @return The annotation of the line
+ */
+public XYAnnotation drawLine(double x0, double y0, double x1, double y1){
+	XYAnnotation lineAnnotation = new XYLineAnnotation(x0, y0, x1, y1);
+	grafica.getXYPlot().addAnnotation(lineAnnotation);
+	return lineAnnotation;
+}
+
+public void deleteAnnotation(XYAnnotation xyannotation){
 	if(xyannotation != null){
 		grafica.getXYPlot().removeAnnotation(xyannotation);
 	}
