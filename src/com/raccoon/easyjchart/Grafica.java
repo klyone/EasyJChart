@@ -16,6 +16,7 @@ package com.raccoon.easyjchart;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
@@ -33,12 +34,12 @@ import javax.imageio.ImageIO;
 
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.JFreeChart;
-import org.jfree.chart.annotations.TextAnnotation;
 import org.jfree.chart.annotations.XYAnnotation;
 import org.jfree.chart.annotations.XYBoxAnnotation;
 import org.jfree.chart.annotations.XYImageAnnotation;
 import org.jfree.chart.annotations.XYLineAnnotation;
 import org.jfree.chart.axis.NumberAxis;
+import org.jfree.chart.axis.ValueAxis;
 import org.jfree.chart.plot.Plot;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.plot.XYPlot;
@@ -558,7 +559,7 @@ public XYAnnotation setImageAtPoint(BufferedImage image, Point2D point){
 	return this.setImageAtPoint(image, point.getX(), point.getY());
 }
 
-public void setAnnotation(XYAnnotation annotation, double x, double y){
+public void setAnnotation(XYAnnotation annotation){
 	grafica.getXYPlot().addAnnotation(annotation);
 }
 
@@ -643,6 +644,11 @@ public void deleteAnnotation(XYAnnotation xyannotation){
 	if(xyannotation != null){
 		grafica.getXYPlot().removeAnnotation(xyannotation);
 	}
+}
+
+public void setDomainAxis(ValueAxis axis, Font font){
+	grafica.getXYPlot().setDomainAxis(0,axis);
+	grafica.getXYPlot().getDomainAxis().setTickLabelFont(font);
 }
 
 
